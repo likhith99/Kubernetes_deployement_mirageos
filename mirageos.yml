@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mirageos-poc
+spec:
+  selector:
+    matchLabels:
+      app: poc-mirageos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: poc-mirageos
+        version: "1.0"
+    spec:
+      containers:
+      - name: poc-mirageos
+        imagePullPolicy: Always
+        image: unikernel/mirage:latest
+        args: [/bin/sh, -c,
+            'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done']
+        ports:
+        - name: http
+          containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 3
